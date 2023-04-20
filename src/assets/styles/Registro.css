@@ -1,0 +1,7 @@
+.container__inputs{
+    height: 120px;
+}
+.fail{
+    color: red;
+    padding-left: 8px;
+}
