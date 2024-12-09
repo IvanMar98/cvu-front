@@ -5,10 +5,10 @@ import photo_perfil_user from '../assets/img/user.png';
 
 function PerfilCuenta() {
     return (
-        <div className='container- fluid'>
-            <div className="row">
-                <div className='col-8 pt-4 pb-5 ps-5 pe-5'>
-                    <div className="d-flex flex-column align-items-center">
+        <div className='container-fluid'>
+            <div className="row h-100">
+                <div className='col-8'>
+                    <div className="h-100 d-flex flex-column align-items-center justify-content-center">
                         <h2>Nombre User</h2>
                         <div className='mt-2 mb-4'>
                             <img src={photo_perfil_user} alt="photo_perfil_user" width='180px' />
@@ -24,8 +24,8 @@ function PerfilCuenta() {
                         </div>
                     </div>
                 </div>
-                <div className='col-4 border-start pt-4 pb-5'>
-                <div className="text-center">
+                <div className='col-4 border-start'>
+                <div className="h-100 d-flex flex-column align-items-center justify-content-center">
                     <h3>Datos Personales</h3>
                     <div className='row text-center mt-4 text-primary'>
                         <div className='col-4'>

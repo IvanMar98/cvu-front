@@ -3,46 +3,13 @@ import Spinner from "./Spinner";
 import Label from "./Label";
 import '../assets/styles/Registro.css'
 import { useForm } from 'react-hook-form';
-import { newRegistry } from "../services/records/postRecord";
 import { useState } from "react";
-
+import registryHook from "../customHooks/registry-hook";
 const Registro = () => {
 
     const [ acceptTermsAndConditions, setAcceptTermsAndConditions ] = useState(false);
-    const [loading, setLoading] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const navigate = useNavigate();
-
-    const customSubmit = async (data) => {
-        const { names, firstLastName, secondLastName, curp, rfc, email, password } = data;
-        
-        if (!acceptTermsAndConditions) {
-            alert('Es necesario que aceptes que la informacion proporcionada es real y correcta');
-            return
-        }
-        try {
-            setLoading(true);
-            // hacer un post en la api con axios
-            const response = await newRegistry({ names, firstLastName, secondLastName, curp, rfc, email, password })
-            console.log(response)
-            if(response.status === 'success') {
-                setTimeout(() => {
-                    setLoading(false);
-                    navigate('/'); 
-                },2000)
-            }else {
-                setTimeout(() => {
-                    setLoading(false);
-                    alert('Hubo un problema al registrar el usuario. Por favor, inténtalo nuevamente.');    
-                })
-            }
-        } catch (error) {
-            setLoading(false); // Desactiva el spinner si ocurre un error inesperado.
-            console.error('Error en el registro:', error);
-            alert('Hubo un problema inesperado. Inténtalo más tarde.');
-
-        }
-    }
+    const { customSubmit, loading } = registryHook({acceptTermsAndConditions});
 
     const handleCheckBoxTermsAndConditions = (event) => {
         const isAccepted = event.target.checked;
@@ -50,7 +17,7 @@ const Registro = () => {
     }
 
     return (
-        <div className="registro container-fluid d-flex flex-column align-items-center mt-3 mb-5">
+        <div className="registro container-fluid d-flex flex-column align-items-center justify-content-center">
             <h1 className="mt-3 text-primary fw-bold">Formulario de Registro</h1>
             <form onSubmit={handleSubmit(customSubmit)} className="container d-flex flex-column align-items-center fw-bold">
                 <div className="container_datos_basicos container mt-4 ps-4 pe-4 pt-1 text-secondary">

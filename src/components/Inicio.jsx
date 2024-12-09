@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 function Inicio() {
     return (
-        <div className="container-fluid d-flex flex-column align-items-center pt-4 pb-4">
+        <div className="container-fluid d-grid">
             <h1 className="text-primary fw-bold mb-5">Menu Principal</h1>
             <div className="container-fluid d-flex flex-column mb-4">
                 <h4 className="text-primary fs-4 ps-3 mb-3">Datos Generales</h4>

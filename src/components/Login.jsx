@@ -2,46 +2,22 @@ import React from 'react';
 import '../assets/styles/Login.css'
 import { useNavigate } from "react-router-dom";
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import { postLogin } from '../services/login/login';
+import loginHook from "../customHooks/login-hook";
 import Spinner from './Spinner';
 
 const Login = () => {
 
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const [loading, setLoading] = useState(false);
+    const { customSubmit, loading } = loginHook()
+
     const handleRegistry = () => {
         navigate('/registrate');
     }
 
-    const customSubmit = async(data) => {
-
-        const { email, password } = data;
-        setLoading(true);
-        try {
-        const response = await postLogin({email, password});
-        if(response.status.code === 200) {
-            setTimeout(() => {
-                setLoading(false);
-                localStorage.setItem('userToken', response.data.token);
-                navigate('/inicio');
-            },2000)
-        }else {
-            setTimeout(() => {
-                setLoading(false);
-                alert('Error al iniciar la sesion, verifica tu informacion');
-            },2000)
-        }
-        } catch (error) {
-        console.error('Error en el Login:', error);
-        alert('Hubo un problema inesperado. Inténtalo más tarde.');
-        }
-    }
-
     return (
         <div className="container-form container-md d-flex flex-column align-items-center 
-            justify-items-center ps-0 pe-0 pt-4 pb-4 mt-3 mb-3 bg-ligth">
+            justify-content-center bg-ligth">
             <div className="mb-4">
                 <h1 className="text-primary fw-bold">Acceso a CACEI</h1>
             </div>
@@ -67,9 +43,9 @@ const Login = () => {
                         pattern: /^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/i
                     })}
                 />
-                <div className='options-container'>
+                <div className="container-form container-md d-flex flex-row align-items-center justify-content-center gap-2">
                     <button className="btn btn-primary">Acceder</button>
-                    <button onClick={handleRegistry} className="btn btn-primary">Registrate</button>
+                    <button onClick={handleRegistry} className="btn btn-secondary">Registrate</button>
                 </div>
             </form>
             {loading && (
