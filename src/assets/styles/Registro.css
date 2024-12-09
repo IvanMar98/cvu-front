@@ -17,6 +17,11 @@
     align-items: center;
     background: rgba(0, 0, 0, 0.9);
     z-index: 9999;
+    visibility: hidden;
+}
+
+.spinner-overlay.show { /* Agrega esta clase solo cuando loading es true */
+    visibility: visible;
 }
 
 .spinner-text {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const newRegistry = ({ names, firstLastName, secondLastName, curp, rfc, email, password }) => {
+export const newRegistry = async ({ names, firstLastName, secondLastName, curp, rfc, email, password }) => {
     const registry = {
         names,
         first_last_name: firstLastName,
@@ -10,7 +10,7 @@ export const newRegistry = ({ names, firstLastName, secondLastName, curp, rfc, e
         email,
         password
     }
-    return axios
+    return await axios
         .post('http://localhost:8001/new-registry', registry)
         .then((response) => {
             const {data} = response;

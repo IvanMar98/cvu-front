@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ClipLoader } from 'react-spinners';
+import Spinner from "./Spinner";
 import Label from "./Label";
 import '../assets/styles/Registro.css'
 import { useForm } from 'react-hook-form';
@@ -13,33 +13,35 @@ const Registro = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
 
-    const customSubmit = (data) => {
+    const customSubmit = async (data) => {
         const { names, firstLastName, secondLastName, curp, rfc, email, password } = data;
         
         if (!acceptTermsAndConditions) {
             alert('Es necesario que aceptes que la informacion proporcionada es real y correcta');
-            
-        } else {
+            return
+        }
+        try {
             setLoading(true);
             // hacer un post en la api con axios
-            newRegistry({ names, firstLastName, secondLastName, curp, rfc, email, password })
-                .then((response) => {
-                    console.log(response)
-                    if(response.status === 'succes'){
-                        setTimeout(() => {
-                            setLoading(false);
-                            navigate('/'); 
-                        }, 3000);
-                    }
+            const response = await newRegistry({ names, firstLastName, secondLastName, curp, rfc, email, password })
+            console.log(response)
+            if(response.status === 'success') {
+                setTimeout(() => {
+                    setLoading(false);
+                    navigate('/'); 
+                },2000)
+            }else {
+                setTimeout(() => {
+                    setLoading(false);
+                    alert('Hubo un problema al registrar el usuario. Por favor, inténtalo nuevamente.');    
                 })
-                .catch((error) => {
-                    setTimeout(() => {
-                        setLoading(false);
-                        console.error('Error en el registro:', error);
-                        alert('Hubo un problema al registrar el usuario. Por favor, inténtalo nuevamente.');    
-                    },3000)
-                });
-        }  
+            }
+        } catch (error) {
+            setLoading(false); // Desactiva el spinner si ocurre un error inesperado.
+            console.error('Error en el registro:', error);
+            alert('Hubo un problema inesperado. Inténtalo más tarde.');
+
+        }
     }
 
     const handleCheckBoxTermsAndConditions = (event) => {
@@ -181,10 +183,10 @@ const Registro = () => {
                 <button className="btn btn-primary">Registrate</button>
             </form>
             {loading && (
-                <div className="spinner-overlay">
-                    <ClipLoader color="#000FFF" loading={loading} size={80} />
-                    <p className="spinner-text">Registrando, por favor espera...</p>
-                </div>
+                <Spinner
+                loading = {loading}
+                text={'Registrando, espere por favor . . .'}
+                ></Spinner>
             )}
         </div>
     )
