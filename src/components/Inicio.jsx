@@ -1,50 +1,78 @@
 import CardItems from "./CardItems";
-import { Link } from "react-router-dom";
+import perfilCuentaHook from "../customHooks/perfil-cuenta-hook";
 
 function Inicio() {
+
+    const { getUserData } = perfilCuentaHook();
+    const cardItems = [
+        {
+            category: 'Datos Generales',
+            items: [
+                {
+                    id: 'perfil-cuenta',
+                    icon: 'fa-solid fa-user',
+                    tittle: 'Perfil y Cuenta'
+                },
+                {
+                    id: 'datos-contacto',
+                    icon: 'fa-solid fa-address-book',
+                    tittle: 'Datos de Contacto'
+                },
+                {
+                    id: 'datos-laborales',
+                    icon: 'fa-solid fa-briefcase',
+                    tittle: 'Datos Laborales'
+                }
+            ]
+        },
+        {
+            category: 'Perfil Academico',
+            items: [
+                {
+                    id: 'productividad-academica',
+                    icon: 'fa-solid fa-book-open-reader',
+                    tittle: 'Productividad Academica'
+                },
+                {
+                    id: 'titulos-academicos',
+                    icon: 'fa-solid fa-graduation-cap',
+                    tittle: 'Titulos Academicos'
+                }
+            ]
+        }
+
+    ]
+
+    const handleClick = (event) => {
+        const { id } = event.currentTarget;
+        switch(id){
+            case 'perfil-cuenta':
+                getUserData();
+        }
+    }
     return (
-        <div className="container-fluid d-grid">
-            <h1 className="text-primary fw-bold mb-5">Menu Principal</h1>
-            <div className="container-fluid d-flex flex-column mb-4">
-                <h4 className="text-primary fs-4 ps-3 mb-3">Datos Generales</h4>
-                <div className=" container-fluid d-flex justify-content-around">
-                    <Link to={'/perfil-cuenta'} className = "text-decoration-none text-dark">
-                        <CardItems 
-                            icon="fa-solid fa-user" 
-                            title="Perfil y Cuenta"
-                        />
-                    </Link>
-                    <Link to={'/datos-contacto'} className = "text-decoration-none text-dark">
-                        <CardItems
-                            icon="fa-solid fa-address-book"
-                            title="Datos de Contacto"
-                        />
-                    </Link>
-                    <Link to={'/datos-laborales'} className = "text-decoration-none text-dark">
-                        <CardItems
-                            icon="fa-solid fa-briefcase" 
-                            title="Datos Laborales"
-                        />
-                    </Link>
-                    
-                </div>
-            </div>
-            <div className="container-fluid d-flex flex-column">
-                <h4 className="text-primary fs-4 ps-3 mb-3">Perfil Academico</h4>
-                <div className="container-fluid d-flex justify-content-around">
-                    <Link to={'/productividad-academica'} className = "text-decoration-none text-dark">
-                        <CardItems
-                            icon="fa-solid fa-book-open-reader"
-                            title="Productividad Academica"
-                        />
-                    </Link>
-                    <Link to={'/titulos-academicos'} className = "text-decoration-none text-dark">
-                        <CardItems
-                            icon="fa-solid fa-graduation-cap"
-                            title="Titulos Academicos"
-                        />
-                    </Link>
-                </div>
+        <div className="container-fluid d-flex flex-column  align-items-center h-100">
+            <h1 className="text-primary fw-bold">Menu Principal</h1>
+            <div className="container-fluid d-flex flex-column h-100 justify-content-center">
+                {cardItems.map((category) => (
+                    <div key={category.category} className="h-100 d-flex flex-column justify-content-center gap-4">
+                        <h4 className="text-primary">{category.category}</h4>
+                        <div key={category.category} className=" container-fluid d-flex justify-content-around">
+                            {category.items.map((item) => (
+                                <div 
+                                role="button" 
+                                onClick={handleClick}
+                                id={item.id}
+                                className = "text-decoration-none text-dark">
+                                    <CardItems
+                                        icon={item.icon}
+                                        title={item.tittle}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );
