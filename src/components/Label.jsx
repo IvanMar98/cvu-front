@@ -2,7 +2,7 @@ import React from 'react'
 
 function Label(props) {
     return (
-        <div className='text-secondary fw-bold mb-2'>
+        <div className={`${props.class ? props.class: 'text-secondary'} fw-bold mb-2`}>
             <label> {props.text}</label>
         </div>
     )
