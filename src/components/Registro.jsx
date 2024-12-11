@@ -1,19 +1,24 @@
-import { useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";
 import Label from "./Label";
+import ModalError from "./ModalError";
 import '../assets/styles/Registro.css'
 import { useForm } from 'react-hook-form';
 import { useState } from "react";
 import registryHook from "../customHooks/registry-hook";
+
 const Registro = () => {
 
     const [ acceptTermsAndConditions, setAcceptTermsAndConditions ] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { customSubmit, loading } = registryHook({acceptTermsAndConditions});
+    const { customSubmit, loading, errorRegistry, errorTitle, errorTextBody, setErrorRegistry } = registryHook({acceptTermsAndConditions});
 
     const handleCheckBoxTermsAndConditions = (event) => {
         const isAccepted = event.target.checked;
         setAcceptTermsAndConditions(isAccepted);
+    }
+
+    const handleCloseModalError = () => {
+        setErrorRegistry(false);
     }
 
     return (
@@ -154,6 +159,13 @@ const Registro = () => {
                 loading = {loading}
                 text={'Registrando, espere por favor . . .'}
                 ></Spinner>
+            )}
+            {errorRegistry && (
+                <ModalError
+                title={errorTitle}
+                textBody={errorTextBody}
+                handleCloseModalError={handleCloseModalError}>
+                </ModalError>
             )}
         </div>
     )

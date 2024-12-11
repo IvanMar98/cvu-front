@@ -4,15 +4,21 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from 'react-hook-form';
 import loginHook from "../customHooks/login-hook";
 import Spinner from './Spinner';
+import ModalError from './ModalError';
 
 const Login = () => {
 
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors } } = useForm();
-    const { customSubmit, loading } = loginHook()
+    const { register, handleSubmit, formState: { errors }, reset} = useForm();
+    const { customSubmit, loading, errorLogin, errorTitle, errorTextBody, setErrorLogin } = loginHook()
 
     const handleRegistry = () => {
         navigate('/registrate');
+    }
+
+    const handleCloseModalError = () => {
+        setErrorLogin(false)
+        reset();
     }
 
     return (
@@ -53,6 +59,13 @@ const Login = () => {
                 loading = {loading}
                 text = 'Iniciando Sesion . . .'
                 ></Spinner>
+            )}
+            {errorLogin && (
+                <ModalError
+                title={errorTitle}
+                textBody={errorTextBody}
+                handleCloseModalError={handleCloseModalError}>
+                </ModalError>
             )}
         </div>
     )
