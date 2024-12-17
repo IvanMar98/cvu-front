@@ -10,15 +10,11 @@ const Registro = () => {
 
     const [ acceptTermsAndConditions, setAcceptTermsAndConditions ] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { customSubmit, loading, errorRegistry, errorTitle, errorTextBody, setErrorRegistry } = registryHook({acceptTermsAndConditions});
+    const { customSubmit, loading, errorRegistry, errorTitle, errorTextBody, handleCloseModalError } = registryHook({acceptTermsAndConditions});
 
     const handleCheckBoxTermsAndConditions = (event) => {
         const isAccepted = event.target.checked;
         setAcceptTermsAndConditions(isAccepted);
-    }
-
-    const handleCloseModalError = () => {
-        setErrorRegistry(false);
     }
 
     return (

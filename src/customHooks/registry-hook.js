@@ -46,7 +46,16 @@ const registryHook = ({ acceptTermsAndConditions }) => {
                     setErrorTextBody('Parece que ya existe una cuenta registrada. Si es tuya, intenta iniciar sesión.');
                 }
             }
+            else {
+                setErrorRegistry(true);
+                setErrorTitle('Error inesperado!');
+                setErrorTextBody('Ocurrió un error al procesar tu solicitud. Intenta de nuevo más tarde.');
+            }
         }
+    }
+
+    const handleCloseModalError = () => {
+        setErrorRegistry(false);
     }
 
     return {
@@ -55,7 +64,7 @@ const registryHook = ({ acceptTermsAndConditions }) => {
         errorRegistry,
         errorTitle,
         errorTextBody,
-        setErrorRegistry
+        handleCloseModalError
     }
 }
 
