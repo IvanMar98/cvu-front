@@ -10,6 +10,7 @@ import BiografiaUpdate from './components/BiografiaUpdate';
 import DatosContacto from './components/DatosContacto';
 import Direcion from './components/Direcion';
 import DatosLaborales from './components/DatosLaborales';
+import EditInfo from './components/EditInfo';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path='/datos-contacto' element={<DatosContacto />}></Route>
         <Route path='/datos-contacto/direccion' element={<Direcion />}></Route>
         <Route path='/datos-laborales' element={<DatosLaborales />}></Route>
+        <Route path='/perfil-cuenta/editar-info' element={< EditInfo/>}></Route>
       </Routes>
       <Footer />
     </div>
