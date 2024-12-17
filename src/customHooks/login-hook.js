@@ -33,14 +33,19 @@ const loginHook = () => {
                     setErrorTitle('Error!')
                     setErrorTextBody('Error al iniciar sesion, por favor verifica tu informacion');
                 },2000);
-            }else {{
+            }else if(error?.response?.status === 404){
+                    setLoading(false);
+                    setErrorLogin(true);
+                    setErrorTitle('Error!')
+                    setErrorTextBody('Usuario no registrado');
+            }else {
                 setTimeout(() => {
                     setLoading(false);
                     setErrorLogin(true);
                     setErrorTitle('Error!')
                     setErrorTextBody('Hubo un problema inesperado, intentalo de nuevo mas tarde');
                 },2000);
-            }}
+            }
         }
     }
 
