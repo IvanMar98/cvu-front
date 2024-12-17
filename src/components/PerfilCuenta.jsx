@@ -3,13 +3,18 @@ import Label from "./Label";
 import { Link } from "react-router-dom";
 import photo_perfil_user from '../assets/img/user.png';
 import perfilCuentaHook from '../customHooks/perfil-cuenta-hook';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import ModalError from './ModalError';
 
 function PerfilCuenta() {
 
     const location = useLocation();
     const { state } = location;
+    const { editUserData, errorTokenExpired, handleCloseModalError } = perfilCuentaHook();
     console.log(state)
+    const handleEditInfoClick = () => {
+        editUserData();
+    }
     
     return (
         <div className='container-fluid'>
@@ -69,15 +74,27 @@ function PerfilCuenta() {
                                 <Label 
                                     text = "Sexo"
                                 />
+                                <Label 
+                                    text = {state?.userData?.gender}
+                                    class = {'text-dark'}
+                                />
                             </div>
                             <div className='col-4'>
                                 <Label 
                                     text = "Pais de Nacimiento"
                                 />
+                                 <Label 
+                                    text = {state?.userData?.countryOfBirth}
+                                    class = {'text-dark'}
+                                />
                             </div>
                             <div className='col-4'>
                                 <Label 
                                     text = "Fecha de nacimiento"
+                                />
+                                <Label 
+                                    text = {state?.userData?.birthdate}
+                                    class = {'text-dark'}
                                 />
                             </div>
                         </div>
@@ -106,9 +123,9 @@ function PerfilCuenta() {
                         </div>
                         <div className='h-100 container-fluid d-flex justify-content-around mt-5'>
                             <div className=''>
-                                <Link to={'/perfil-cuenta/editar-info'} className="btn btn-info">
+                                <button onClick={handleEditInfoClick} className="btn btn-info">
                                     Editar Informacion
-                                </Link>
+                                </button>
                             </div>
                             <div className=''>
                                 <Link to={'/inicio'} className="btn btn-primary">
@@ -118,6 +135,14 @@ function PerfilCuenta() {
                         </div>
                     </div>
                 </div>
+                {
+                errorTokenExpired && (
+                <ModalError
+                title={'Error'}
+                textBody={'Por seguridad, tu sesion ha expirado. Inicia sesion nuevamente para continuar'}
+                handleCloseModalError={handleCloseModalError}
+                ></ModalError>)
+            }
             </div>
         </div>
     )

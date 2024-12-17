@@ -1,9 +1,10 @@
 import CardItems from "./CardItems";
 import perfilCuentaHook from "../customHooks/perfil-cuenta-hook";
+import ModalError from "./ModalError";
 
 function Inicio() {
 
-    const { getUserData } = perfilCuentaHook();
+    const { getUserData, errorTokenExpired, handleCloseModalError } = perfilCuentaHook();
     const cardItems = [
         {
             category: 'Datos Generales',
@@ -74,6 +75,14 @@ function Inicio() {
                     </div>
                 ))}
             </div>
+            {
+                errorTokenExpired && (
+                <ModalError
+                title={'Error'}
+                textBody={'Por seguridad, tu sesion ha expirado. Inicia sesion nuevamente para continuar'}
+                handleCloseModalError={handleCloseModalError}
+                ></ModalError>)
+            }
         </div>
     );
 }
