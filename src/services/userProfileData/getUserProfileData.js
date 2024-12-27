@@ -17,11 +17,9 @@ export const getUserProfileData = async () => {
 }
 
 export const updateProfileData = async (newData) => {
-    console.log(newData)
-    const { names, firstLastName, secondLastName, birthdate, countryOfBirth, curp, rfc, gender } = newData;
+    const { names, firstLastName, secondLastName, birthdate, countryOfBirth, curp, rfc, gender, imageProfile } = newData;
     const token = localStorage.getItem('userToken');
     const userId = localStorage.getItem('userId');
-
     return await axios
         .put(`http://localhost:8001/update-info/${userId}`, 
             {
@@ -32,7 +30,8 @@ export const updateProfileData = async (newData) => {
                 countryOfBirth,
                 gender,
                 curp,
-                rfc
+                rfc,
+                image_profile: imageProfile
             },
             {
             headers: {
