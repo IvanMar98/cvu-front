@@ -1,0 +1,35 @@
+.container figure {
+    height: 250px;
+    width: 250px;
+    border-radius: 50%;
+    box-shadow: 0px 10px 8px 10px rgba(0, 0, 0, 0.2);
+}
+
+.container figure img {
+    transition: all 500ms ease-out;
+}
+
+.container figure .layer {
+    background: rgba(23, 109, 249, 0.9);
+    transition: all 500ms ease-out;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.container figure:hover .layer {
+    opacity: 1;
+    visibility: visible;
+}
+
+.fa-image {
+    font-size: 30px;
+    color: white;
+}
+
+#input-image {
+    display: none;
+}
+.label-image {
+    text-align: center;
+    cursor: pointer;
+}
