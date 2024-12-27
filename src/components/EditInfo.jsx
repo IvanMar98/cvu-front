@@ -1,14 +1,11 @@
 import { useForm } from "react-hook-form";
 import Label from "./Label";
-import { useLocation } from "react-router-dom";
-import perfilCuentaHook from "../customHooks/perfil-cuenta-hook";
+import usePerfilCuentaHook from "../customHooks/usePerfilCuentaHook.js";
 import { useEffect } from "react";
+import { useUserContext } from "../context/UserContext";
 
 function EditInfo(){
-    const location = useLocation();
-    const { state } = location;
-    console.log(state)
-    const { countries } = state?.userData;
+    const { userData, countries } = useUserContext();
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             names: "",
@@ -19,30 +16,29 @@ function EditInfo(){
             rfc: "",
             gender: "",
             countryOfBirth: ""
-
         }
     });
 
-    const { updateUserInfo } = perfilCuentaHook();
+    const { updateUserInfo } = usePerfilCuentaHook();
 
     useEffect(() => {
-        if(state?.userData) {
-            const formattedDate = state.userData.birthdate
-            ? new Date(state.userData.birthdate).toISOString().split("T")[0]
+        if(userData) {
+            const formattedDate = userData.birthdate
+            ? new Date(userData.birthdate).toISOString().split("T")[0]
             : "";
 
         reset({
-            names: state.userData.names || "",
-            firstLastName: state.userData.first_last_name || "",
-            secondLastName: state.userData.second_last_name || "",
+            names: userData.names || "",
+            firstLastName: userData.first_last_name || "",
+            secondLastName: userData.second_last_name || "",
             birthdate: formattedDate, // Fecha en formato YYYY-MM-DD
-            curp: state.userData.curp || "",
-            rfc: state.userData.rfc || "",
-            gender: state.userData.gender || "",
-            countryOfBirth: state.userData.countryOfBirth || ""
+            curp: userData.curp || "",
+            rfc: userData.rfc || "",
+            gender: userData.gender || "",
+            countryOfBirth: userData.countryOfBirth || ""
         }); 
         }
-    }, [state, reset])
+    }, [userData, reset])
 
     return(
         <div className="container-fluid">

@@ -2,23 +2,18 @@ import React from 'react';
 import '../assets/styles/Login.css'
 import { useNavigate } from "react-router-dom";
 import { useForm } from 'react-hook-form';
-import loginHook from "../customHooks/login-hook";
+import useLoginHook from "../customHooks/useLoginHook";
 import Spinner from './Spinner';
 import ModalError from './ModalError';
 
 const Login = () => {
 
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors }, reset} = useForm();
-    const { customSubmit, loading, errorLogin, errorTitle, errorTextBody, setErrorLogin } = loginHook()
+    const { register, handleSubmit, reset} = useForm();
+    const { customSubmit, loading, errorState, closeAndResetModalError } = useLoginHook({reset})
 
     const handleRegistry = () => {
         navigate('/registrate');
-    }
-
-    const handleCloseModalError = () => {
-        setErrorLogin(false)
-        reset();
     }
 
     return (
@@ -60,11 +55,12 @@ const Login = () => {
                 text = 'Iniciando Sesion . . .'
                 ></Spinner>
             )}
-            {errorLogin && (
+            {errorState.isError && (
                 <ModalError
-                title={errorTitle}
-                textBody={errorTextBody}
-                handleCloseModalError={handleCloseModalError}>
+                title={errorState.title}
+                textBody={errorState.textBody}
+                id={errorState.modalErrorId}
+                handleCloseModalError={closeAndResetModalError}>
                 </ModalError>
             )}
         </div>

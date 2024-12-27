@@ -1,10 +1,13 @@
 import CardItems from "./CardItems";
-import perfilCuentaHook from "../customHooks/perfil-cuenta-hook";
+
 import ModalError from "./ModalError";
+import useInicioHook from "../customHooks/useInicioHook";
+import { useNavigate } from "react-router-dom";
 
 function Inicio() {
-
-    const { getUserData, errorTokenExpired, handleCloseModalError } = perfilCuentaHook();
+    const { errorState, handleCloseModalError } = useInicioHook();
+    const navigate = useNavigate();
+    
     const cardItems = [
         {
             category: 'Datos Generales',
@@ -44,11 +47,12 @@ function Inicio() {
 
     ]
 
-    const handleClick = (event) => {
+    const handleClick = async (event) => {
         const { id } = event.currentTarget;
         switch(id){
             case 'perfil-cuenta':
-                getUserData();
+                navigate('/perfil-cuenta');
+                break;
         }
     }
     return (
@@ -76,10 +80,11 @@ function Inicio() {
                 ))}
             </div>
             {
-                errorTokenExpired && (
+                errorState.isError && (
                 <ModalError
-                title={'Error'}
-                textBody={'Por seguridad, tu sesion ha expirado. Inicia sesion nuevamente para continuar'}
+                id={errorState.modalErrorId}
+                title={errorState.title}
+                textBody={errorState.textBody}
                 handleCloseModalError={handleCloseModalError}
                 ></ModalError>)
             }

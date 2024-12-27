@@ -4,13 +4,13 @@ import ModalError from "./ModalError";
 import '../assets/styles/Registro.css'
 import { useForm } from 'react-hook-form';
 import { useState } from "react";
-import registryHook from "../customHooks/registry-hook";
+import useRegistryHook from "../customHooks/useRegistryHook";
 
 const Registro = () => {
 
     const [ acceptTermsAndConditions, setAcceptTermsAndConditions ] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { customSubmit, loading, errorRegistry, errorTitle, errorTextBody, handleCloseModalError } = registryHook({acceptTermsAndConditions});
+    const { customSubmit, loading, errorState, handleCloseModalError } = useRegistryHook({acceptTermsAndConditions});
 
     const handleCheckBoxTermsAndConditions = (event) => {
         const isAccepted = event.target.checked;
@@ -156,11 +156,14 @@ const Registro = () => {
                 text={'Registrando, espere por favor . . .'}
                 ></Spinner>
             )}
-            {errorRegistry && (
+            {errorState.isError && (
                 <ModalError
-                title={errorTitle}
-                textBody={errorTextBody}
-                handleCloseModalError={handleCloseModalError}>
+                title={errorState.title}
+                textBody={errorState.textBody}
+                id={errorState.modalErrorId}
+                isRetry={errorState.canUserRetry}
+                handleCloseModalError={handleCloseModalError}
+                handleRetryRegistry={customSubmit}>
                 </ModalError>
             )}
         </div>

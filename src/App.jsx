@@ -11,24 +11,27 @@ import DatosContacto from './components/DatosContacto';
 import Direcion from './components/Direcion';
 import DatosLaborales from './components/DatosLaborales';
 import EditInfo from './components/EditInfo';
+import { UserProvider } from './context/UserContext';
 
 function App() {
   return (
-    <div className="App">
-      <Header />
-      <Routes>
-        <Route path='/' element = {<Login />}/>
-        <Route path='/inicio' element = {<Inicio />}></Route>
-        <Route path='/registrate' element = {<Registro />}></Route>
-        <Route path='/perfil-cuenta' element={<PerfilCuenta />}></Route>
-        <Route path='/perfil-cuenta/biografia' element={<BiografiaUpdate />}></Route>
-        <Route path='/datos-contacto' element={<DatosContacto />}></Route>
-        <Route path='/datos-contacto/direccion' element={<Direcion />}></Route>
-        <Route path='/datos-laborales' element={<DatosLaborales />}></Route>
-        <Route path='/perfil-cuenta/editar-info' element={< EditInfo/>}></Route>
-      </Routes>
-      <Footer />
-    </div>
+    <UserProvider>
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path='/' element = {<Login />}/>
+          <Route path='/inicio' element = {<Inicio />}></Route>
+          <Route path='/registrate' element = {<Registro />}></Route>
+          <Route path='/perfil-cuenta' element={<PerfilCuenta />}></Route>
+          <Route path='/perfil-cuenta/biografia' element={<BiografiaUpdate />}></Route>
+          <Route path='/datos-contacto' element={<DatosContacto />}></Route>
+          <Route path='/datos-contacto/direccion' element={<Direcion />}></Route>
+          <Route path='/datos-laborales' element={<DatosLaborales />}></Route>
+          <Route path='/perfil-cuenta/editar-info' element={< EditInfo/>}></Route>
+        </Routes>
+        <Footer />
+      </div>
+    </UserProvider>
   )
 }
 

@@ -1,19 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Label from "./Label";
 import { Link } from "react-router-dom";
-import photo_perfil_user from '../assets/img/user.png';
-import perfilCuentaHook from '../customHooks/perfil-cuenta-hook';
-import { useLocation, useNavigate } from 'react-router-dom';
+import usePerfilCuentaHook from '../customHooks/usePerfilCuentaHook';
 import ModalError from './ModalError';
+import ImageProfile from './ImageProfile';
+import { useUserContext } from '../context/UserContext';
 
 function PerfilCuenta() {
 
-    const location = useLocation();
-    const { state } = location;
-    const { editUserData, errorTokenExpired, handleCloseModalError } = perfilCuentaHook();
-    console.log(state)
+    const { userData } = useUserContext();
+    const { editUserData, errorState, handleCloseModalError, updateImageProfile, getUserData } = usePerfilCuentaHook();
+    
     const handleEditInfoClick = () => {
         editUserData();
+    }
+
+    const handleImageChange = async (e) => {
+        const image = e.currentTarget.files[0];
+        console.log(image)
+        if(image) {
+            await updateImageProfile(image);
+        }
+        e.target.value = '';
     }
     
     return (
@@ -21,10 +29,11 @@ function PerfilCuenta() {
             <div className="row h-100">
                 <div className='col-7'>
                     <div className="h-100 d-flex flex-column align-items-center justify-content-center">
-                        <h2>{state.userData.names} {state.userData.first_last_name} {state.userData.second_last_name}</h2>
-                        <div className='mt-2 mb-4'>
-                            <img src={photo_perfil_user} alt="photo_perfil_user" width='180px' />
-                        </div>
+                        <h2>{userData?.names} {userData?.first_last_name} {userData?.second_last_name}</h2>
+                        <ImageProfile
+                        image= {userData?.image_profile}
+                        handleImageChange={handleImageChange}></ImageProfile>
+                    
                         <div className='d-flex flex-row mb-4 justify-content-center align-items-center'>
                             <h3>Biografia</h3>
                             <Link to={'/perfil-cuenta/biografia'} className = "ms-2">
@@ -45,7 +54,7 @@ function PerfilCuenta() {
                                     text = "Nombre(s)"
                                 />
                                 <Label
-                                    text = {state.userData.names}
+                                    text = {userData?.names}
                                     class = {'text-dark'}
                                 />
                             </div>
@@ -54,7 +63,7 @@ function PerfilCuenta() {
                                     text = "Apellido Paterno"
                                 />
                                 <Label 
-                                    text = {state.userData.first_last_name}
+                                    text = {userData?.first_last_name}
                                     class = {'text-dark'}
                                 />
                             </div>
@@ -63,7 +72,7 @@ function PerfilCuenta() {
                                     text = "Apellido Materno"
                                 />
                                 <Label 
-                                    text = {state.userData.second_last_name}
+                                    text = {userData?.second_last_name}
                                     class = {'text-dark'}
                                 />
                             </div>
@@ -75,7 +84,7 @@ function PerfilCuenta() {
                                     text = "Sexo"
                                 />
                                 <Label 
-                                    text = {state?.userData?.gender}
+                                    text = {userData?.gender}
                                     class = {'text-dark'}
                                 />
                             </div>
@@ -84,7 +93,7 @@ function PerfilCuenta() {
                                     text = "Pais de Nacimiento"
                                 />
                                  <Label 
-                                    text = {state?.userData?.countryOfBirth}
+                                    text = {userData?.countryOfBirth}
                                     class = {'text-dark'}
                                 />
                             </div>
@@ -93,12 +102,12 @@ function PerfilCuenta() {
                                     text = "Fecha de nacimiento"
                                 />
                                 <Label 
-                                    text = {state?.userData?.birthdate}
+                                    text = {userData?.birthdate}
                                     class = {'text-dark'}
                                 />
                             </div>
                         </div>
-                        {state.userData.gender === null &&
+                        {userData?.gender === null &&
                             <div>Aun no has llenado tu informacion basica</div>}
                         <div className='h-100 row text-center mt-4'>
                             <h3 className='mb-4'>Claves de registro</h3>
@@ -107,7 +116,7 @@ function PerfilCuenta() {
                                     text = "CURP"
                                 />
                                 <Label 
-                                    text = {state.userData.curp}
+                                    text = {userData?.curp}
                                     class = {'text-dark'}
                                 />
                             </div>
@@ -116,7 +125,7 @@ function PerfilCuenta() {
                                     text = "RFC"
                                 />
                                 <Label 
-                                    text = {state.userData.rfc}
+                                    text = {userData?.rfc}
                                     class = {'text-dark'}
                                 />
                             </div>
@@ -136,11 +145,14 @@ function PerfilCuenta() {
                     </div>
                 </div>
                 {
-                errorTokenExpired && (
+                errorState.isError && (
                 <ModalError
-                title={'Error'}
-                textBody={'Por seguridad, tu sesion ha expirado. Inicia sesion nuevamente para continuar'}
+                title={errorState.title}
+                textBody={errorState.textBody}
+                id={errorState.modalErrorId}
+                isRetry={errorState.canUserRetry}
                 handleCloseModalError={handleCloseModalError}
+                handleRetryRegistry={getUserData}
                 ></ModalError>)
             }
             </div>
