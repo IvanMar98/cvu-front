@@ -7,7 +7,8 @@ import { useUserContext } from "../context/UserContext";
 const useRegistryHook = ({ acceptTermsAndConditions }) => {
     const navigate = useNavigate();
     const { handleError, errorState, handleCloseModalError} = useHanleErrorsHook();
-    const { setLoading, loading } = useUserContext();
+    const { setLoading, loading, setModalState } = useUserContext();
+    
 
     const customSubmit = async (data) => {
         setLoading(true);
@@ -30,7 +31,17 @@ const useRegistryHook = ({ acceptTermsAndConditions }) => {
             if(response.status === 'success') {
                 setTimeout(() => {
                     setLoading(false);
-                    navigate('/'); 
+                    setModalState({
+                        openModal: true,
+                        title: 'Usuario Registrado!',
+                        textBody: 'El usuario a sido registrado con extio.',
+                        modalId: 'modal-user-registry-success',
+                        mainButtonText: 'Ok',
+                        canUserRetry: false,
+                        icon: 'fa-solid fa-circle-check',
+                        type: 'success'
+                    })
+                    
                 },2000)
             }
         } catch (error) {

@@ -1,12 +1,17 @@
 import { useForm } from "react-hook-form";
 import Label from "./Label";
-import usePerfilCuentaHook from "../customHooks/usePerfilCuentaHook.js";
+import useEditUserInfoHook from "../customHooks/useEditUserInfoHook.js";
 import { useEffect } from "react";
 import { useUserContext } from "../context/UserContext";
+import Spinner from "./Spinner.jsx";
+import ModalError from "./ModalError.jsx";
 
 function EditInfo(){
+    const { handleCloseModalError, updateUserInfo, editUserInfo, handleCancelEditInfo} = useEditUserInfoHook();
+    const { loading, modalState } = useUserContext();
+
     const { userData, countries } = useUserContext();
-    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    const { register, handleSubmit, formState: { errors, isDirty }, reset } = useForm({
         defaultValues: {
             names: "",
             firstLastName: "",
@@ -18,8 +23,6 @@ function EditInfo(){
             countryOfBirth: ""
         }
     });
-
-    const { updateUserInfo } = usePerfilCuentaHook();
 
     useEffect(() => {
         if(userData) {
@@ -103,8 +106,7 @@ function EditInfo(){
                                 <option value="M">Masculino</option>
                                 <option value="F">Femenino</option> 
                             </select>
-                            {errors.names?.type === 'required' && <small className="fail">*El campo es requerido</small>}
-                            {errors.names?.type === 'pattern' && <small className="fail">*No se permiten caracteres especiales o numeros.</small>}
+                            {errors.gender?.type === 'required' && <small className="fail">*El campo es requerido</small>}
                         </div>
                         <div className="d-felx flex-column col-4">
                             <Label
@@ -121,8 +123,7 @@ function EditInfo(){
                                      <option key={country.id_pais} value={country.id_pais}>{country.nombre_pais}</option>
                                 ))}
                             </select>
-                            {errors.firstLastName?.type === 'required' && <small className="fail">*El campo es requerido</small>}
-                            {errors.firstLastName?.type === 'pattern' && <small className="fail">*No se permiten caracteres especiales o numeros.</small>}
+                            {errors.countryOfBirth?.type === 'required' && <small className="fail">*El campo es requerido</small>}
                         </div>
                         <div className="d-felx felx-column col-4">
                             <Label
@@ -137,8 +138,7 @@ function EditInfo(){
                                     required: true
                                 })}
                             />
-                            {errors.secondLastName?.type === 'required' && <small className="fail">*El campo es requerido</small>}
-                            {errors.secondLastName?.type === 'pattern' && <small className="fail">*No se permiten caracteres especiales o numeros.</small>}
+                            {errors.birthdate?.type === 'required' && <small className="fail">*El campo es requerido</small>}
                         </div>
                     </div>
                     <p className="title_datos_basicos text-primary fw-bold mt-2 mb-3">Claves de Registro</p>
@@ -174,10 +174,31 @@ function EditInfo(){
                     </div>
                 </div>
                 <div className="d-flex w-100 justify-content-around align-items-center h-100">
-                    <button className="btn btn-primary">Actualizar Informacion</button>
-                    <button className="btn btn-danger">Cancelar</button>
+                    <button type="submit" className="btn btn-primary" disabled = {!isDirty} >Actualizar Informacion</button>
+                    <button type="button" className="btn btn-danger" onClick={() => handleCancelEditInfo(isDirty)}>Cancelar</button>
                 </div>
             </form>
+            {loading && (
+                <Spinner
+                loading = {loading}
+                text={''}
+                ></Spinner>
+            )}
+            {
+                modalState.openModal && (
+                <ModalError
+                title={modalState.title}
+                textBody={modalState.textBody}
+                id={modalState.modalId}
+                isRetry={modalState.canUserRetry}
+                type={modalState.type}
+                icon={modalState.icon}
+                mainButtonText={modalState.mainButtonText}
+                secondaryButtonText={modalState.secondaryButtonText}
+                handleCloseModalError={handleCloseModalError}
+                handleRetry={handleCloseModalError}
+                ></ModalError>)
+            }
         </div>
     );
 };

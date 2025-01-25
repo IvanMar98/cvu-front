@@ -1,22 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../context/UserContext";
 
 
 const useHanleErrorsHook = () => {
     const navigate = useNavigate();
 
-    const [ errorState, setErrorState ] = useState({
-        isError: false,
-        title: '',
-        textBody: '',
-        modalErrorId: '',
-        canUserRetry: false
-    });
     const [attemptNumber, setAttemptNumber] = useState(0);
+
+    const { modalState, setModalState } = useUserContext();
 
     const handleErrorsFromRegistry = (error) => {
         const status = error?.response?.status;
-        let newErrorState = {isError: true, title: '', textBody: '', modalErrorId: ''};
+        let newErrorState = {openModal: true, title: '', textBody: '', modalId: '', icon: '', type: ''};
         switch(status) {
             case 409:
                 newErrorState = { ...newErrorState, ...errorsUniqueness(error) };
@@ -24,9 +20,12 @@ const useHanleErrorsHook = () => {
             case 'warning':
                 newErrorState = {
                     ...newErrorState,
-                    title: 'Advertencia!',
+                    title: 'Ooops!',
                     textBody: 'Para continuar es necesario que acepte que la informacion proporcionada es real y correcta',
-                    modalErrorId: 'modal-error-accept-terms',
+                    modalId: 'modal-error-accept-terms',
+                    mainButtonText: 'Ok',
+                    icon: 'fa-solid fa-triangle-exclamation',
+                    type: 'warning'
                 };
                 break;
             default:
@@ -38,25 +37,25 @@ const useHanleErrorsHook = () => {
                 console.log(newErrorState)
                 break;
         }
-        setErrorState(newErrorState)
+        setModalState(newErrorState)
     }
 
     const handleErrorsFromLogin = (error) => {
         const status = error?.response?.status;
-        let newErrorState = {isError: true, title: '', textBody: '', modalErrorId: ''};
+        let newErrorState = {openModal: true, title: '', textBody: '', modalId: '', icon: 'fa-solid fa-xmark', type: 'danger', mainButtonText: 'Ok'};
         switch(status) {
             case 404:
                 newErrorState = { ...newErrorState,
                     title: 'Error!',
                     textBody: 'Usuario no registrado',
-                    modalErrorId: 'modal-error-user-already-registered'
+                    modalId: 'modal-error-user-already-registered'
                  };
                 break;
             case 401:
                 newErrorState = { ...newErrorState,
                     title: 'Error!',
                     textBody: 'Error al iniciar sesion, por favor verifica tu informacion',
-                    modalErrorId: 'modal-error-login-incorrect-information'
+                    modalId: 'modal-error-login-incorrect-information'
                     };
                 break;
             default:
@@ -64,38 +63,37 @@ const useHanleErrorsHook = () => {
                     ...newErrorState,
                     title: 'Error inesperado!',
                     textBody: 'Hubo un problema inesperado, intentalo de nuevo mas tarde',
-                    modalErrorId: 'modal-error-unexpected-login',
+                    modalId: 'modal-error-unexpected-login',
                 };
                 break;
         }
-        setErrorState(newErrorState)
+        setModalState(newErrorState)
     }
 
     const handleErrorsFromInicio = (error) => {
         console.log(error)
-        let newErrorState = {isError: true, title: '', textBody: '', modalErrorId: ''};
+        let newErrorState = {openModal: true, title: '', textBody: '', modalId: '', icon: 'fa-solid fa-xmark', type: 'danger'};
         const status = error?.response?.status;
         if(status === 401) {
-            console.log('dentro if')
             newErrorState = 
                 {   ...newErrorState,
                     title: 'Sesión Expirada',
                     textBody: 'Por seguridad, inicia sesión nuevamente para continuar.',
-                    modalErrorId: 'modal-error-expired-token'
+                    mainButtonText: 'Ok',
+                    modalId: 'modal-error-expired-token'
                 }
         };
-        setErrorState(newErrorState)
+        setModalState(newErrorState)
     }
 
     const handleErrorsFromPerfilCuenta = (error) => {
-        console.log(error)
         const status = error?.response?.status;
         console.log(status)
-        let newErrorState = {isError: true, title: '', textBody: '', modalErrorId: '', canUserRetry: false};
+        let newErrorState = {openModal: true, title: '', textBody: '', modalId: '', canUserRetry: false, icon: 'fa-solid fa-xmark', type: 'danger', mainButtonText: 'Ok'};
         switch(status) {
             case 404:
                 if(error.response.data.message === 'User not found') {
-                    const retryProfileAccountError = retryProfileAccount();
+                    const retryProfileAccountError = retryShowData();
                     newErrorState = {
                         ...newErrorState,
                         ...retryProfileAccountError
@@ -105,7 +103,7 @@ const useHanleErrorsHook = () => {
                         ...newErrorState,
                         title: 'Error!',
                         textBody: 'Error al cargar el archivo.',
-                        modalErrorId: 'modal-error-image-profile',
+                        modalId: 'modal-error-image-profile',
                     };
                 };
                 break;
@@ -114,7 +112,7 @@ const useHanleErrorsHook = () => {
                     ...newErrorState,
                     title: 'Error!',
                     textBody: 'Error al cargar el archivo.',
-                    modalErrorId: 'modal-error-image-profile',
+                    modalId: 'modal-error-image-profile',
                 };
                 break;
             case 401:
@@ -122,7 +120,7 @@ const useHanleErrorsHook = () => {
                     ...newErrorState,
                     title: 'Sesión Expirada',
                     textBody: 'Por seguridad, inicia sesión nuevamente para continuar.',
-                    modalErrorId: 'modal-error-expired-token',
+                    modalId: 'modal-error-expired-token',
                 };
                 break;
             default:
@@ -130,11 +128,44 @@ const useHanleErrorsHook = () => {
                     ...newErrorState,
                     title: 'Error inesperado!',
                     textBody: 'No se pudo completar la operación.',
-                    modalErrorId: 'modal-error-unexpected',
+                    modalId: 'modal-error-unexpected',
                 };
                 break;
         }
-        setErrorState(newErrorState);
+        setModalState(newErrorState);
+    };
+
+    const handleErrorsFromEditInfo = (error) => {
+        console.log('error edit info', error.response.status)
+        const status = error?.response?.status;
+        let newErrorState = {openModal: true, title: '', textBody: '', modalId: '', canUserRetry: false, icon: 'fa-solid fa-xmark', type: 'danger', mainButtonText: 'Ok',};
+        switch(status) {
+            case 404:
+                const editInfoAttemps = retryShowData();
+                newErrorState = {
+                    ... newErrorState,
+                    ...editInfoAttemps,
+                    modalId: 'modal-error-data-edit-info'
+                };
+                break;
+            case 401:
+                newErrorState = {
+                    ...newErrorState,
+                    title: 'Sesión Expirada',
+                    textBody: 'Por seguridad, inicia sesión nuevamente para continuar.',
+                    modalId: 'modal-error-expired-token',
+                };
+                break;
+            default:
+                newErrorState = {
+                    ...newErrorState,
+                    title: 'Warning',
+                    textBody: 'Revisa la informacion e intentalo nuevamente',
+                    modalId: 'modal-error-info-duplicated',
+                    type: 'warning'
+                };
+        }
+        setModalState(newErrorState);
     }
 
     const handleError = (from, error) => {
@@ -151,28 +182,29 @@ const useHanleErrorsHook = () => {
             case 'perfil-cuenta':
                 handleErrorsFromPerfilCuenta(error);
                 break;
+            case 'edit-info':
+                handleErrorsFromEditInfo(error);
+                break;
             default:
                 break;
         }
     };
 
     const errorsUniqueness = (error) => {
-        let newErrorState = {isError: true, title: '', textBody: '', modalErrorId: ''};
+        let newErrorState = {openModal: true, title: 'Ooops!', textBody: '', modalId: '', icon: 'fa-solid fa-triangle-exclamation', type: 'warning'};
         const { errors} = error?.response?.data;
         const findFiled = errors.find((field) => field.field === 'curp' || field.field === 'rfc' || field.field === 'email').field;
         if(findFiled !== 'email') {
             newErrorState = {
                 ...newErrorState,
-                title: 'Advertencia!',
                 textBody: 'Por favor, revisa la información e inténtalo nuevamente.',
-                modalErrorId: 'modal-error-field-repeted'
+                modalId: 'modal-error-field-repeted',
             }
         }else {
             newErrorState = {
                 ...newErrorState,
-                title: 'Advertencia!',
                 textBody: 'Parece que ya existe una cuenta registrada. Si es tuya, intenta iniciar sesión.',
-                modalErrorId: 'modal-error-account-already-registered'
+                modalId: 'modal-error-account-already-registered'
             }
         }
         return newErrorState;
@@ -198,6 +230,7 @@ const useHanleErrorsHook = () => {
                 break;
             case 'modal-error-account-already-registered-primary-button':
                 resetModal();
+                navigate('/')
                 break;
             case 'modal-error-user-already-registered-primary-button':
                 resetModal();
@@ -215,7 +248,22 @@ const useHanleErrorsHook = () => {
             case 'modal-error-image-profile-primary-button':
                 resetModal();
                 break;
-                
+            case 'modal-user-info-updated-success-primary-button':
+                resetModal();
+                navigate('/perfil-cuenta');
+                break;
+            case 'modal-user-registry-success-primary-button':
+                resetModal();
+                navigate('/'); 
+                break;
+            case 'modal-error-data-edit-info-primary-button':
+                resetModal();
+                navigate('/inicio'); 
+                break;
+            case 'modal-edit-info-are-user-sure-to-leave-primary-button':
+                resetModal();
+                navigate('/perfil-cuenta'); 
+                break; 
             default:
                 resetModal();
                 break;
@@ -227,14 +275,18 @@ const useHanleErrorsHook = () => {
     let errorAttempt = {
         title: 'Error inesperado!',
         textBody: '',
-        modalErrorId: 'modal-error-unexpected-registro',
-        canUserRetry: true
+        modalId: 'modal-error-unexpected-registro',
+        canUserRetry: true,
+        mainButtonText: 'Salir',
+        icon: 'fa-solid fa-xmark',
+        type: 'danger'
     }
     if(attemptNumber < 3) {
         setAttemptNumber((prevAttempt) => prevAttempt + 1);
         errorAttempt = {
             ...errorAttempt,
             textBody: 'No se pudo completar la operación. Intentelo nuevamente',
+            secondaryButtonText: 'Reintentar',
         };        
     } else {
         setAttemptNumber(0);
@@ -247,11 +299,13 @@ const useHanleErrorsHook = () => {
     return errorAttempt;
    }
 
-   const retryProfileAccount = () => {
+   const retryShowData = () => {
     let errorAttempt = {
         title: 'Error!',
         textBody: '',
-        modalErrorId: 'modal-error-data',
+        modalId: 'modal-error-data',
+        mainButtonText: 'Ok',
+        secondaryButtonText: 'Reintentar',
         canUserRetry: true
     };
     if(attemptNumber < 3) {
@@ -269,21 +323,24 @@ const useHanleErrorsHook = () => {
         };
     }
     return errorAttempt;
-   }
+   };
 
     const resetModal = () => {
-        setErrorState({
-            isError: false,
+        console.log('Reset modal')
+        setModalState({
+            openModal: false,
             title: '',
             textBody: '',
             modalId: '',
+            icon:'',
+            type: '',
+            canUserRetry: false
         });
     };
 
     return {
         handleError,
-        handleCloseModalError,
-        errorState
+        handleCloseModalError
     }
 
 };

@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { getUserProfileData, updateProfileData } from "../services/userProfileData/getUserProfileData";
-import { getCountries } from "../services/countries/getCountries";
 import { useEffect, useState } from "react";
 import { postImageProfile } from "../services/userProfileData/postImageProfile";
 import { useUserContext } from "../context/UserContext";
@@ -10,7 +9,7 @@ const usePerfilCuentaHook = () => {
     const { handleError, errorState, handleCloseModalError } = useHanleErrorsHook();
     const navigate = useNavigate();
 
-    const { setUserData, setCountries } = useUserContext();
+    const { setUserData } = useUserContext();
 
     const formatBirthdate = (birthdate) => {
         return birthdate ? new Date(birthdate).toISOString().split("T")[0] : "";
@@ -28,37 +27,6 @@ const usePerfilCuentaHook = () => {
             handleError('perfil-cuenta', error);
         }
     };
-
-    //cambiar a hook para edit info
-    const editUserData = async () => {
-        try {
-            const response = await getCountries();
-            if(response.status === 'succes') {
-                setCountries(response.data);
-                navigate('/perfil-cuenta/editar-info');
-            }
-        } catch (error) {
-            handleError(error);
-        }
-    }
-
-    // cambiar a hook para edit info
-    const updateUserInfo = async(newData) => {
-        try {
-            const response = await updateProfileData(newData);
-            if(response.status === 'success') {
-                const userData = response.data;
-                userData.birthdate = formatBirthdate(userData.birthdate);
-                setUserData((prevData) => ({
-                    ...prevData,
-                    ...userData
-                }))
-                navigate('/perfil-cuenta')
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
 
     const updateImageProfile = async (image) => {
         const formData = new FormData();
@@ -87,10 +55,8 @@ const usePerfilCuentaHook = () => {
 
     return {
         getUserData,
-        editUserData,
         errorState,
         handleCloseModalError,
-        updateUserInfo,
         updateImageProfile
     }
 }

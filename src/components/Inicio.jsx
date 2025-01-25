@@ -3,9 +3,11 @@ import CardItems from "./CardItems";
 import ModalError from "./ModalError";
 import useInicioHook from "../customHooks/useInicioHook";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../context/UserContext";
 
 function Inicio() {
-    const { errorState, handleCloseModalError } = useInicioHook();
+    const { handleCloseModalError } = useInicioHook();
+    const { modalState } = useUserContext();
     const navigate = useNavigate();
     
     const cardItems = [
@@ -80,11 +82,13 @@ function Inicio() {
                 ))}
             </div>
             {
-                errorState.isError && (
+                modalState.openModal && (
                 <ModalError
-                id={errorState.modalErrorId}
-                title={errorState.title}
-                textBody={errorState.textBody}
+                id={modalState.modalId}
+                title={modalState.title}
+                textBody={modalState.textBody}
+                icon={modalState.icon}
+                type={modalState.type}
                 handleCloseModalError={handleCloseModalError}
                 ></ModalError>)
             }

@@ -15,7 +15,23 @@
 .modal-error {
     background-color: aliceblue;
     width: 500px;
-    height: 220px;
+    height: 290px;
     border-radius: 20px;
     padding-bottom: 20px;
+}
+.modal-warning-type {
+    color: #ffc107;
+}
+
+.modal-danger-type {
+    color: #dc3545;
+}
+
+.modal-success-type {
+    color: #198754
+}
+.modal-top-bar {
+    height: 100px;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
 }

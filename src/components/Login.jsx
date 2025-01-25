@@ -5,12 +5,15 @@ import { useForm } from 'react-hook-form';
 import useLoginHook from "../customHooks/useLoginHook";
 import Spinner from './Spinner';
 import ModalError from './ModalError';
+import { useUserContext } from '../context/UserContext';
 
 const Login = () => {
 
     const navigate = useNavigate();
     const { register, handleSubmit, reset} = useForm();
-    const { customSubmit, loading, errorState, closeAndResetModalError } = useLoginHook({reset})
+    const { customSubmit, loading, closeAndResetModalError } = useLoginHook({reset})
+
+    const { modalState  } = useUserContext();
 
     const handleRegistry = () => {
         navigate('/registrate');
@@ -55,11 +58,14 @@ const Login = () => {
                 text = 'Iniciando Sesion . . .'
                 ></Spinner>
             )}
-            {errorState.isError && (
+            {modalState.openModal && (
                 <ModalError
-                title={errorState.title}
-                textBody={errorState.textBody}
-                id={errorState.modalErrorId}
+                icon={modalState.icon}
+                type={modalState.type}
+                title={modalState.title}
+                textBody={modalState.textBody}
+                mainButtonText={modalState.mainButtonText}
+                id={modalState.modalId}
                 handleCloseModalError={closeAndResetModalError}>
                 </ModalError>
             )}

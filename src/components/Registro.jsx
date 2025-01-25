@@ -5,13 +5,15 @@ import '../assets/styles/Registro.css'
 import { useForm } from 'react-hook-form';
 import { useState } from "react";
 import useRegistryHook from "../customHooks/useRegistryHook";
+import { useUserContext } from "../context/UserContext";
 
 const Registro = () => {
 
     const [ acceptTermsAndConditions, setAcceptTermsAndConditions ] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { customSubmit, loading, errorState, handleCloseModalError } = useRegistryHook({acceptTermsAndConditions});
+    const { customSubmit, loading, handleCloseModalError } = useRegistryHook({acceptTermsAndConditions});
 
+    const { modalState  } = useUserContext();
     const handleCheckBoxTermsAndConditions = (event) => {
         const isAccepted = event.target.checked;
         setAcceptTermsAndConditions(isAccepted);
@@ -156,14 +158,18 @@ const Registro = () => {
                 text={'Registrando, espere por favor . . .'}
                 ></Spinner>
             )}
-            {errorState.isError && (
+            {modalState.openModal && (
                 <ModalError
-                title={errorState.title}
-                textBody={errorState.textBody}
-                id={errorState.modalErrorId}
-                isRetry={errorState.canUserRetry}
+                icon={modalState.icon}
+                type={modalState.type}
+                title={modalState.title}
+                textBody={modalState.textBody}
+                id={modalState.modalId}
+                isRetry={modalState.canUserRetry}
+                mainButtonText={modalState.mainButtonText}
+                secondaryButtonText={modalState.secondaryButtonText}
                 handleCloseModalError={handleCloseModalError}
-                handleRetryRegistry={customSubmit}>
+                handleRetry={customSubmit}>
                 </ModalError>
             )}
         </div>

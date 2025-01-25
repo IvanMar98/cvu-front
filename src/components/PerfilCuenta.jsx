@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import Label from "./Label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import usePerfilCuentaHook from '../customHooks/usePerfilCuentaHook';
 import ModalError from './ModalError';
 import ImageProfile from './ImageProfile';
 import { useUserContext } from '../context/UserContext';
 
 function PerfilCuenta() {
+    const {handleCloseModalError, updateImageProfile, getUserData } = usePerfilCuentaHook();
 
-    const { userData } = useUserContext();
-    const { editUserData, errorState, handleCloseModalError, updateImageProfile, getUserData } = usePerfilCuentaHook();
-    
+    const { userData, modalState } = useUserContext();
+    const navigate = useNavigate();
+
     const handleEditInfoClick = () => {
-        editUserData();
+        navigate('/perfil-cuenta/editar-info');
     }
 
     const handleImageChange = async (e) => {
         const image = e.currentTarget.files[0];
-        console.log(image)
         if(image) {
             await updateImageProfile(image);
         }
@@ -145,14 +145,17 @@ function PerfilCuenta() {
                     </div>
                 </div>
                 {
-                errorState.isError && (
+                modalState.openModal && (
                 <ModalError
-                title={errorState.title}
-                textBody={errorState.textBody}
-                id={errorState.modalErrorId}
-                isRetry={errorState.canUserRetry}
+                title={modalState.title}
+                textBody={modalState.textBody}
+                id={modalState.modalId}
+                isRetry={modalState.canUserRetry}
+                type={modalState.type}
+                icon={modalState.icon}
+                mainButtonText={modalState.mainButtonText}
                 handleCloseModalError={handleCloseModalError}
-                handleRetryRegistry={getUserData}
+                handleRetry={getUserData}
                 ></ModalError>)
             }
             </div>
