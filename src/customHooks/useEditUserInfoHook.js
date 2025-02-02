@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import useHanleErrorsHook from "./useHandleErrorsHook";
 import { getCountries } from "../services/countries/getCountries"
 import { useUserContext } from "../context/UserContext";
-import { updateProfileData } from "../services/userProfileData/getUserProfileData";
+import { updateProfileData } from "../services/userProfileData/updateUserProfileData";
 import { useNavigate } from "react-router-dom";
 
 const useEditUserInfoHook = () => {
@@ -69,7 +69,6 @@ const useEditUserInfoHook = () => {
     }
 
     const handleCancelEditInfo = (isDirty) => {
-        console.log(isDirty)
         if(isDirty) {
             setModalState({
                 openModal: true,
@@ -83,7 +82,6 @@ const useEditUserInfoHook = () => {
                 type: 'warning'
             })
         }else {
-
             navigate('/perfil-cuenta');
         }
     }

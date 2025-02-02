@@ -136,7 +136,6 @@ const useHanleErrorsHook = () => {
     };
 
     const handleErrorsFromEditInfo = (error) => {
-        console.log('error edit info', error.response.status)
         const status = error?.response?.status;
         let newErrorState = {openModal: true, title: '', textBody: '', modalId: '', canUserRetry: false, icon: 'fa-solid fa-xmark', type: 'danger', mainButtonText: 'Ok',};
         switch(status) {
@@ -183,6 +182,9 @@ const useHanleErrorsHook = () => {
                 handleErrorsFromPerfilCuenta(error);
                 break;
             case 'edit-info':
+                handleErrorsFromEditInfo(error);
+                break;
+            case 'biography':
                 handleErrorsFromEditInfo(error);
                 break;
             default:
@@ -264,6 +266,10 @@ const useHanleErrorsHook = () => {
                 resetModal();
                 navigate('/perfil-cuenta'); 
                 break; 
+            case 'modal-user-biography-updated-success-primary-button':
+                resetModal();
+                navigate('/perfil-cuenta'); 
+                break;
             default:
                 resetModal();
                 break;

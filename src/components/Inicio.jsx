@@ -4,10 +4,11 @@ import ModalError from "./ModalError";
 import useInicioHook from "../customHooks/useInicioHook";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
+import Spinner from "./Spinner";
 
 function Inicio() {
     const { handleCloseModalError } = useInicioHook();
-    const { modalState } = useUserContext();
+    const { modalState, loading } = useUserContext();
     const navigate = useNavigate();
     
     const cardItems = [
@@ -81,6 +82,15 @@ function Inicio() {
                     </div>
                 ))}
             </div>
+            {
+                loading && (
+                   <Spinner
+                        loading = {loading}
+                        text={''}
+                    >
+                   </Spinner> 
+                )
+            }
             {
                 modalState.openModal && (
                 <ModalError

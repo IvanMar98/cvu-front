@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { getUserProfileData, updateProfileData } from "../services/userProfileData/getUserProfileData";
+import { updateProfileData } from "../services/userProfileData/updateUserProfileData";
+import { getUserProfileData } from "../services/userProfileData/getUserProfileData";
 import { useEffect, useState } from "react";
 import { postImageProfile } from "../services/userProfileData/postImageProfile";
 import { useUserContext } from "../context/UserContext";
@@ -9,7 +10,7 @@ const usePerfilCuentaHook = () => {
     const { handleError, errorState, handleCloseModalError } = useHanleErrorsHook();
     const navigate = useNavigate();
 
-    const { setUserData } = useUserContext();
+    const { setUserData, setLoading } = useUserContext();
 
     const formatBirthdate = (birthdate) => {
         return birthdate ? new Date(birthdate).toISOString().split("T")[0] : "";
@@ -24,7 +25,11 @@ const usePerfilCuentaHook = () => {
                 setUserData(userData);
             }
         } catch (error) {
-            handleError('perfil-cuenta', error);
+            setLoading(true);
+            setTimeout(() => {
+                setLoading(false);
+                handleError('perfil-cuenta', error);
+            },500);
         }
     };
 
@@ -37,14 +42,17 @@ const usePerfilCuentaHook = () => {
                 const imageUrl = `http://localhost:8001/${response.path}`
                 const newData = { imageProfile: imageUrl }
                 const putImage = await updateProfileData(newData);
-                console.log(putImage)
                 setUserData((prevData) => ({ 
                     ... prevData,
                     image_profile: putImage.image_profile || imageUrl
                 }));
             }
         } catch (error) {
-            handleError('perfil-cuenta', error);
+            setLoading(true);
+            setTimeout(() => {
+                setLoading(false);
+                handleError('perfil-cuenta', error);
+            },1000)
         }
     };
 

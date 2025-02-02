@@ -5,11 +5,12 @@ import usePerfilCuentaHook from '../customHooks/usePerfilCuentaHook';
 import ModalError from './ModalError';
 import ImageProfile from './ImageProfile';
 import { useUserContext } from '../context/UserContext';
+import Spinner from './Spinner';
 
 function PerfilCuenta() {
     const {handleCloseModalError, updateImageProfile, getUserData } = usePerfilCuentaHook();
 
-    const { userData, modalState } = useUserContext();
+    const { userData, modalState, loading } = useUserContext();
     const navigate = useNavigate();
 
     const handleEditInfoClick = () => {
@@ -41,7 +42,9 @@ function PerfilCuenta() {
                             </Link>
                         </div>
                         <div className='text-center'>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque reiciendis saepe non voluptatibus omnis obcaecati quisquam reprehenderit deleniti molestias consectetur nulla dignissimos ipsa iusto a deserunt illo, temporibus cum quas! Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptate natus dolorem itaque sit, expedita temporibus nobis ipsa quisquam nam, ad, minus architecto numquam exercitationem corporis saepe? Voluptas obcaecati officiis placeat!</p>
+                        <div dangerouslySetInnerHTML={{__html: userData?.biography}}></div>
+                        {userData?.biography === null &&
+                            <div className='bg-warning'>Cuentanos un poco de ti . . .</div>}
                         </div>
                     </div>
                 </div>
@@ -108,7 +111,7 @@ function PerfilCuenta() {
                             </div>
                         </div>
                         {userData?.gender === null &&
-                            <div>Aun no has llenado tu informacion basica</div>}
+                            <div className='bg-warning text-center'>Aun no has llenado tu informacion basica</div>}
                         <div className='h-100 row text-center mt-4'>
                             <h3 className='mb-4'>Claves de registro</h3>
                             <div className='col-6'>
@@ -144,6 +147,15 @@ function PerfilCuenta() {
                         </div>
                     </div>
                 </div>
+                {
+                    loading && (
+                    <Spinner
+                            loading = {loading}
+                            text={''}
+                        >
+                    </Spinner> 
+                    )
+                }
                 {
                 modalState.openModal && (
                 <ModalError
