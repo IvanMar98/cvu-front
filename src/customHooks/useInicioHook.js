@@ -1,34 +1,42 @@
 import { useEffect, useState } from "react";
 import { verifyAuth } from "../services/auth/auth";
-import useHandleErrorsHook from "./useHandleErrorsHook";
 import { useUserContext } from "../context/UserContext";
+import { getModalById, getModalCloseAction } from "../utils/moodalConfig";
+import { useNavigate } from "react-router-dom";
 
 const useInicioHook = () => {
-    const { handleError, errorState, handleCloseModalError } = useHandleErrorsHook();
-    const { setLoading } = useUserContext();
+    const navigate = useNavigate();
+    const { setLoading, setModalState } = useUserContext();
+
     const checkAuth = async () => {
         try {
             const response = await verifyAuth();
-            if(response.status === 'success') {
-                return true;
-            }
-            return false;
         } catch (error) {
             setLoading(true);
             setTimeout(() => {
                 setLoading(false);
-                handleError('inicio', error);
-                return false;
-            }, 1000) 
+                const { errorCode } = error?.response?.data || {}
+                const modalConfigBase = getModalById(errorCode);
+                const modalConfigCopy = { ...modalConfigBase, openModal: true};
+                setModalState(modalConfigCopy);
+            }, 500) 
         }
     };
+
+    const handleCloseModalError = (e) => {
+        const { id } = e.currentTarget;
+        const closeCase = getModalCloseAction(id);
+        if(closeCase?.navigate){
+            navigate('/')
+        };
+        setModalState(getModalById('CLEAN-MODAL'));
+    }
 
     useEffect(() => {
       checkAuth();
     }, []);
     
     return {
-        errorState,
         handleCloseModalError
     }
 };

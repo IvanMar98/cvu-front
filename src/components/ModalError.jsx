@@ -2,7 +2,7 @@ import '../assets/styles/ModalError.css'
 
 const ModalError = ({ title, textBody, handleCloseModalError, id, isRetry, handleRetry, icon, type, mainButtonText, secondaryButtonText }) => {
     return (
-        <div className='modal-error-container' onClick={handleCloseModalError}>
+        <div className='modal-error-container'>
             <div className='modal-error d-flex flex-column align-items-center'>
                 <div className={`modal-top-bar bg-${type}`}></div>
                 <div className={`modal-error-icon modal-${type}-type h-100 w-100 d-flex flex-column justify-content-center align-items-center`}>

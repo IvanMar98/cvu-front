@@ -1,18 +1,19 @@
 import axios from "axios";
 
-export const postImageProfile = async (image) => {
+export const deletePhoneNumber = async (phoneNumber) => {
     const token = localStorage.getItem('userToken');
+    const userId = localStorage.getItem('userId');
+
     return await axios
-        .post('http://localhost:8001/update-image-profile', 
-            image,
+        .delete(`http://localhost:8001/phone-numbers/${userId}/${phoneNumber}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`
-                },
+                }
             }
         )
         .then((response) => {
             const {data} = response;
             return data;
-        });
+        })
 }

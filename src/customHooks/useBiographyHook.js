@@ -1,37 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import useHanleErrorsHook from "./useHandleErrorsHook";
 import { useUserContext } from "../context/UserContext";
 import { updateProfileData } from "../services/userProfileData/updateUserProfileData";
 import { verifyAuth } from "../services/auth/auth";
 import { useNavigate } from "react-router-dom";
+import { getModalById, getModalCloseAction, retryOperation } from "../utils/moodalConfig";
 
 const useBiographyHook = () => {
-    const { handleError, handleCloseModalError, } = useHanleErrorsHook();
     const { setUserData, setLoading, setModalState } = useUserContext();
+    const [attemptNumber, setAttemptNumber] = useState(0);
     const navigate = useNavigate();
+    const lastBiografy = useRef()
 
     const userBiography = async () => {
-        setLoading(true);
         try {
             const response = await verifyAuth();
-            console.log('response', response)
-            if(response.status === 'success') {
-                setLoading(false);
-                return true;
-            }
-            setLoading(false);
-            return false;
         } catch (error) {
-            handleError('biography', error);
-            setLoading(false);
-            return false;
+            setLoading(true);
+            setTimeout(() => {
+                setLoading(false);
+                const { errorCode } = error?.response?.data || {}
+                const modalConfigBase = getModalById(errorCode);
+                const modalConfigCopy = { ...modalConfigBase, openModal: true};
+                setModalState(modalConfigCopy);
+            }, 500) 
         }
-    }
+    };
 
     const editUserBiography = async(biography) => {
+        lastBiografy.current = biography;
+        setModalState({ openModal: false });
+        setLoading(true);
         try {
-            console.log('edit biography', biography);
-            setLoading(true);
             const response = await updateProfileData(biography);
             if(response.status === 'success') {
                 const userData = response.data;
@@ -41,85 +41,60 @@ const useBiographyHook = () => {
                 }))
                 setTimeout(() => {
                     setLoading(false);
-                    setModalState({
-                        openModal: true,
-                        title: 'Informacion Actualizada!',
-                        textBody: 'La informacion a sido actualizada con exito.',
-                        mainButtonText: 'Ok',
-                        modalId: 'modal-user-biography-updated-success',
-                        canUserRetry: false,
-                        icon: 'fa-solid fa-circle-check',
-                        type: 'success'
-                    });
+                    const modalConfigBase = getModalById('SUCCESS-UPDATE-INFO-001');
+                    const modalConfigCopy = {...modalConfigBase, openModal: true}
+                    setModalState(modalConfigCopy);
                 },2000)
             }
         } catch (error) {
+            const { errorCode } = error?.response?.data || {};
+            const modalConfigBase = getModalById(errorCode);
+        
+            const modalConfigCopy = { ...modalConfigBase, openModal: true};
+            if(errorCode === 'UNF-003') {
+                modalConfigCopy.canUserRetry = true,
+                modalConfigCopy.maxRetries = 3
+            }
+            const { attemptNumber: newAttempt, modalConf: updatedConf } = retryOperation(modalConfigCopy, attemptNumber);
+            setAttemptNumber(newAttempt);
+            
             setTimeout(() => {
                 setLoading(false);
-                handleError('biography', error);
-            }, 1000)
+                setModalState(updatedConf);
+            },1000)
         }
-        
     }
-
     const handleCancelEditInfo = (isDirty) => {
         if(isDirty) {
-            setModalState({
-                openModal: true,
-                title: 'Advertencia!',
-                textBody: '¿Seguro que deseas cancelar el proceso?. Los datos ya ingresados no se guardaran',
-                modalId: 'modal-edit-info-are-user-sure-to-leave',
-                mainButtonText: 'Salir',
-                secondaryButtonText: 'Cancelar',
-                canUserRetry: true,
-                icon: 'fa-solid fa-circle-check',
-                type: 'warning'
-            })
+            const modalBase = getModalById('CANCEL-EDIT-INFO');
+            const modalCopy = { ...modalBase, openModal: true }
+            setModalState(modalCopy)
         }else {
             navigate('/perfil-cuenta');
         }
     }
 
-    const applyStyleText = (style) => {
-        console.log('apply')
-        const textArea = document.getElementById('biography-text-area');
-        textArea.focus();
-        console.log(textArea.selectionStart)
-        
-        const startText = textArea.selectionStart;
-        const endText = textArea.selectionEnd;
-
-
-        console.log(startText, endText)
-        if(startText === endText) return
-
-        const selectedText = textArea.value.substring(startText, endText);
-        let styledText = '';
-        switch(style){
-            case 'bold':
-                styledText = `**${selectedText}**`
-                break;
-            case "italic":
-                styledText = `*${selectedText}*`;
-                break;
-            case "underline":
-                styledText = `__${selectedText}__`;
-                break;
-            default:
-                styledText = selectedText;
+    const retryUpdateBiografy = (e) => {
+        const { id } = e.currentTarget;
+        if(id === 'modal-edit-info-are-user-sure-to-leave-secondary-button') {
+            setModalState(getModalById('CLEAN-MODAL'))
+        }else {
+            if(lastBiografy.current) {
+                setLoading(true);
+                editUserBiography(lastBiografy.current);
+            }
         }
-        const newText = textArea.value.substring(0, startText) +styledText + textArea.value.substring(endText);
-        const newData = {
-            biography: newText
-        }
-        
-        setUserData( (prevData) => ({
-            ...prevData,
-            ...newData
-        }));
-        console.log(newData)
     }
-        
+    
+    const handleCloseModalError = (e) => {
+        const { id } = e.currentTarget;
+        const closeCase = getModalCloseAction(id);
+        if(closeCase?.navigate){
+            const navigateTo = closeCase.navigateTo? closeCase.navigateTo : '/perfil-cuenta'
+            navigate(`${navigateTo}`);  
+        };
+        setModalState(getModalById('CLEAN-MODAL'));
+    }
 
     useEffect(() => {
         userBiography()
@@ -129,7 +104,7 @@ const useBiographyHook = () => {
        editUserBiography,
        handleCloseModalError,
        handleCancelEditInfo,
-       applyStyleText
+       retryUpdateBiografy
     }
 
 };

@@ -151,7 +151,7 @@ function PerfilCuenta() {
                     loading && (
                     <Spinner
                             loading = {loading}
-                            text={''}
+                            text={'Registrando, espere por favor . . .'}
                         >
                     </Spinner> 
                     )
@@ -166,6 +166,7 @@ function PerfilCuenta() {
                 type={modalState.type}
                 icon={modalState.icon}
                 mainButtonText={modalState.mainButtonText}
+                secondaryButtonText={modalState.secondaryButtonText}
                 handleCloseModalError={handleCloseModalError}
                 handleRetry={getUserData}
                 ></ModalError>)

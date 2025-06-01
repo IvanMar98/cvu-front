@@ -1,21 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import useHanleErrorsHook from "./useHandleErrorsHook";
 import { getCountries } from "../services/countries/getCountries"
 import { useUserContext } from "../context/UserContext";
 import { updateProfileData } from "../services/userProfileData/updateUserProfileData";
 import { useNavigate } from "react-router-dom";
+import { getModalById, retryOperation, getModalCloseAction } from "../utils/moodalConfig";
 
 const useEditUserInfoHook = () => {
-    const { handleError, handleCloseModalError, } = useHanleErrorsHook();
     const { setUserData, setCountries, setLoading, setModalState } = useUserContext();
+    const [ attemptNumber, setAttemptNumber ] = useState(0);
     const navigate = useNavigate();
+    const lastUserInfo = useRef()
 
     const editUserInfo = async () => {
-        console.log('edit info loading')
+        setModalState({ openModal: false });
         setLoading(true);
         try {
             const response = await getCountries();
-            console.log(response)
             if(response.status === 'succes') {
                 setTimeout(() => {
                     setLoading(false)
@@ -23,9 +24,14 @@ const useEditUserInfoHook = () => {
                 },1000);
             }
         } catch (error) {
+            const { errorCode } = error?.response?.data || {};
+            const modalConfigBase = getModalById(errorCode);
+            const modalConfigCopy = { ...modalConfigBase, openModal: true};
+            const { attemptNumber: newAttempt, modalConf: updatedConf } = retryOperation(modalConfigCopy, attemptNumber);
+            setAttemptNumber(newAttempt);
             setTimeout(() => {
                 setLoading(false);
-                handleError('edit-info', error);
+                setModalState(updatedConf);
             },1000)
         }
     }
@@ -35,8 +41,10 @@ const useEditUserInfoHook = () => {
     };
 
     const updateUserInfo = async(newData) => {
+        lastUserInfo.current = newData;
+        setModalState({ openModal: false });
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await updateProfileData(newData);
             if(response.status === 'success') {
                 const userData = response.data;
@@ -47,40 +55,58 @@ const useEditUserInfoHook = () => {
                 }))
                 setTimeout(() => {
                     setLoading(false);
-                    setModalState({
-                        openModal: true,
-                        title: 'Informacion Actualizada!',
-                        textBody: 'La informacion a sido actualizada con exito.',
-                        mainButtonText: 'Ok',
-                        modalId: 'modal-user-info-updated-success',
-                        canUserRetry: false,
-                        icon: 'fa-solid fa-circle-check',
-                        type: 'success'
-                    });
-                    
+                    const modalConfigBase = getModalById('SUCCESS-UPDATE-INFO-001');
+                    const modalConfigCopy = {...modalConfigBase, openModal: true}
+                    setModalState(modalConfigCopy);
                 },2000)
             }
         } catch (error) {
+            const { errorCode } = error?.response?.data || {};
+            const modalConfigBase = getModalById(errorCode);
+            const modalConfigCopy = { ...modalConfigBase, openModal: true};
+            if(errorCode === 'UNF-003') {
+                modalConfigCopy.canUserRetry = true,
+                modalConfigCopy.maxRetries = 3
+            }
+            const { attemptNumber: newAttempt, modalConf: updatedConf } = retryOperation(modalConfigCopy, attemptNumber);
+            setAttemptNumber(newAttempt);
             setTimeout(() => {
                 setLoading(false);
-                handleError('edit-info', error);
+                setModalState(updatedConf);
             },1000)
+        }
+    }
+
+    const handleCloseModalError = (e) => {
+        const { id } = e.currentTarget;
+        const closeCase = getModalCloseAction(id);
+        if(closeCase?.navigate){
+            const navigateTo = closeCase.navigateTo? closeCase.navigateTo : '/perfil-cuenta'
+            navigate(`${navigateTo}`);  
+        };
+        setModalState(getModalById('CLEAN-MODAL'));
+    }
+
+    const retryEditInfo = (e) => {
+        const { id } = e.currentTarget;
+        if(id === 'modal-error-PNF-001-secondary-button') {
+            setLoading(true);
+            editUserInfo();
+        }else if(id === 'modal-error-UNF-003-secondary-button'){
+            if(lastUserInfo.current){
+                
+                updateUserInfo(lastUserInfo.current);
+            }
+        }else {
+            setModalState(getModalById('CLEAN-MODAL'))
         }
     }
 
     const handleCancelEditInfo = (isDirty) => {
         if(isDirty) {
-            setModalState({
-                openModal: true,
-                title: 'Advertencia!',
-                textBody: '¿Seguro que deseas cancelar el proceso?. Los datos ya ingresados no se guardaran',
-                modalId: 'modal-edit-info-are-user-sure-to-leave',
-                mainButtonText: 'Salir',
-                secondaryButtonText: 'Cancelar',
-                canUserRetry: true,
-                icon: 'fa-solid fa-circle-check',
-                type: 'warning'
-            })
+            const modalBase = getModalById('CANCEL-EDIT-INFO');
+            const modalCopy = { ...modalBase, openModal: true }
+            setModalState(modalCopy);
         }else {
             navigate('/perfil-cuenta');
         }
@@ -91,11 +117,11 @@ const useEditUserInfoHook = () => {
     }, []);
 
     return {
-       handleError,
        handleCloseModalError,
        updateUserInfo,
        editUserInfo,
-       handleCancelEditInfo
+       handleCancelEditInfo,
+       retryEditInfo
     }
 
 };

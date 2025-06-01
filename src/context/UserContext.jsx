@@ -15,6 +15,7 @@ export const UserProvider = ( { children }) => {
         icon: '',
         type: ''
     });
+    const [ userDataLoaded, setUserDataLoaded ] = useState(false);
 
     const data = {
         userData,
@@ -24,7 +25,9 @@ export const UserProvider = ( { children }) => {
         loading,
         setLoading,
         modalState,
-        setModalState
+        setModalState,
+        userDataLoaded,
+        setUserDataLoaded
     }
 
     return (

@@ -10,10 +10,10 @@ import { useUserContext } from "../context/UserContext";
 const Registro = () => {
 
     const [ acceptTermsAndConditions, setAcceptTermsAndConditions ] = useState(false);
-    const { register, handleSubmit, formState: { errors } } = useForm();
-    const { customSubmit, loading, handleCloseModalError } = useRegistryHook({acceptTermsAndConditions});
+    const { register, handleSubmit, formState: { errors, isDirty } } = useForm();
+    const { customSubmit, handleCloseModalError, retryRegistry, handleCancelRegistry } = useRegistryHook({acceptTermsAndConditions});
 
-    const { modalState  } = useUserContext();
+    const { modalState, loading  } = useUserContext();
     const handleCheckBoxTermsAndConditions = (event) => {
         const isAccepted = event.target.checked;
         setAcceptTermsAndConditions(isAccepted);
@@ -150,7 +150,10 @@ const Registro = () => {
                         Acepto que la información proporcionada es real y correcta.
                     </label>
                 </div>
-                <button className="btn btn-primary">Registrate</button>
+                <div className="container-buttons-registry">
+                    <button type="submit" className="btn btn-primary">Registrate</button>
+                    <button type="button" className="btn btn-danger" onClick={() => {handleCancelRegistry(isDirty)}}> Cancelar</button>
+                </div>
             </form>
             {loading && (
                 <Spinner
@@ -169,7 +172,7 @@ const Registro = () => {
                 mainButtonText={modalState.mainButtonText}
                 secondaryButtonText={modalState.secondaryButtonText}
                 handleCloseModalError={handleCloseModalError}
-                handleRetry={customSubmit}>
+                handleRetry={retryRegistry}>
                 </ModalError>
             )}
         </div>

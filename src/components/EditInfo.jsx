@@ -7,7 +7,7 @@ import Spinner from "./Spinner.jsx";
 import ModalError from "./ModalError.jsx";
 
 function EditInfo(){
-    const { handleCloseModalError, updateUserInfo, editUserInfo, handleCancelEditInfo} = useEditUserInfoHook();
+    const { handleCloseModalError, updateUserInfo, editUserInfo, handleCancelEditInfo, retryEditInfo} = useEditUserInfoHook();
     const { loading, modalState } = useUserContext();
 
     const { userData, countries } = useUserContext();
@@ -196,7 +196,7 @@ function EditInfo(){
                 mainButtonText={modalState.mainButtonText}
                 secondaryButtonText={modalState.secondaryButtonText}
                 handleCloseModalError={handleCloseModalError}
-                handleRetry={handleCloseModalError}
+                handleRetry={retryEditInfo}
                 ></ModalError>)
             }
         </div>

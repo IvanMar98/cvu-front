@@ -56,6 +56,9 @@ function Inicio() {
             case 'perfil-cuenta':
                 navigate('/perfil-cuenta');
                 break;
+            case 'datos-contacto':
+                navigate('/datos-contacto');
+                break;
         }
     }
     return (
@@ -99,6 +102,7 @@ function Inicio() {
                 textBody={modalState.textBody}
                 icon={modalState.icon}
                 type={modalState.type}
+                mainButtonText={modalState.mainButtonText}
                 handleCloseModalError={handleCloseModalError}
                 ></ModalError>)
             }

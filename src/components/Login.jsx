@@ -11,9 +11,9 @@ const Login = () => {
 
     const navigate = useNavigate();
     const { register, handleSubmit, reset} = useForm();
-    const { customSubmit, loading, closeAndResetModalError } = useLoginHook({reset})
+    const { customSubmit, closeAndResetModalError } = useLoginHook({reset})
 
-    const { modalState  } = useUserContext();
+    const { modalState, loading  } = useUserContext();
 
     const handleRegistry = () => {
         navigate('/registrate');

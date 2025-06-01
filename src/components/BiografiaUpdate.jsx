@@ -9,7 +9,7 @@ import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
 function BiografiaUpdate(){
-    const { editUserBiography, handleCloseModalError, handleCancelEditInfo, applyStyleText } = useBiographyHook();
+    const { editUserBiography, handleCloseModalError, handleCancelEditInfo, retryUpdateBiografy } = useBiographyHook();
     const { userData, loading, modalState } = useUserContext();
     const { register, handleSubmit, formState: { errors, isDirty }, reset, watch, setValue } = useForm({
         defaultValues: {
@@ -86,7 +86,7 @@ function BiografiaUpdate(){
                 mainButtonText={modalState.mainButtonText}
                 secondaryButtonText={modalState.secondaryButtonText}
                 handleCloseModalError={handleCloseModalError}
-                handleRetry={handleCloseModalError}
+                handleRetry={retryUpdateBiografy}
                 ></ModalError>)
             }
             
